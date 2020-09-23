@@ -25,13 +25,29 @@ module Types
                                description: 'Search for timdex records' do
       argument :searchterm, String, required: true
       argument :from, String, required: false, default_value: '0'
+
+      # applied facets
+      argument :content_type, String, required: false, default_value: nil
+      argument :contributors, [String], required: false, default_value: nil
+      argument :format, [String], required: false, default_value: nil
+      argument :languages, [String], required: false, default_value: nil
+      argument :literary_form, String, required: false, default_value: nil
       argument :source, String, required: false, default_value: 'All'
+      argument :subjects, [String], required: false, default_value: nil
     end
 
-    def search(searchterm:, from:, source:)
+    def search(searchterm:, from:, content_type:, contributors:, format:, 
+               languages:, literary_form:, source:, subjects:)
       query = {}
       query[:q] = searchterm
+
+      query[:content_format] = format
+      query[:content_type] = content_type
+      query[:contributors] = contributors
+      query[:language] = languages
+      query[:literary_form] = literary_form
       query[:source] = source if source != 'All'
+      query[:subject] = subjects
 
       results = Search.new.search(from, query)
 
