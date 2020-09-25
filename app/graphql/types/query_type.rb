@@ -36,7 +36,7 @@ module Types
       argument :subjects, [String], required: false, default_value: nil
     end
 
-    def search(searchterm:, from:, content_type:, contributors:, format:, 
+    def search(searchterm:, from:, content_type:, contributors:, format:,
                languages:, literary_form:, source:, subjects:)
       query = {}
       query[:q] = searchterm
