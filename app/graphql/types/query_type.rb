@@ -36,18 +36,8 @@ module Types
       argument :subjects, [String], required: false, default_value: nil
     end
 
-    def search(searchterm:, from:, content_type:, contributors:, format:,
-               languages:, literary_form:, source:, subjects:)
-      query = {}
-      query[:q] = searchterm
-
-      query[:content_format] = format
-      query[:content_type] = content_type
-      query[:contributors] = contributors
-      query[:language] = languages
-      query[:literary_form] = literary_form
-      query[:source] = source if source != 'All'
-      query[:subject] = subjects
+    def search(searchterm:, from:, **facets)
+      query = construct_query(searchterm, facets)
 
       results = Search.new.search(from, query)
 
@@ -56,6 +46,19 @@ module Types
       response[:records] = results['hits']['hits'].map { |x| x['_source'] }
       response[:aggregations] = collapse_buckets(results['aggregations'])
       response
+    end
+
+    def construct_query(searchterm, facets)
+      query = {}
+      query[:q] = searchterm
+      query[:content_format] = facets['format']
+      query[:content_type] = facets['content_type']
+      query[:contributors] = facets['contributors']
+      query[:language] = facets['languages']
+      query[:literary_form] = facets['literary_form']
+      query[:source] = facets['source'] if facets['source'] != 'All'
+      query[:subject] = facets['subjects']
+      query
     end
 
     def collapse_buckets(es_aggs)
